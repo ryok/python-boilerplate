@@ -17,7 +17,27 @@
 
 ## インストール
 
-### 開発環境のセットアップ
+### 開発環境のセットアップ（uvを使用）
+
+```bash
+# リポジトリのクローン
+git clone https://github.com/yourusername/python-boilerplate.git
+cd python-boilerplate
+
+# uvのインストール（まだインストールしていない場合）
+pip install uv
+
+# uvを使用して仮想環境の作成と依存パッケージのインストール
+uv venv
+source .venv/bin/activate  # Linuxの場合
+# または
+.venv\Scripts\activate  # Windowsの場合
+
+# 開発用依存パッケージのインストール
+uv pip install -e ".[dev]"
+```
+
+### 従来の方法（pipを使用）
 
 ```bash
 # リポジトリのクローン
