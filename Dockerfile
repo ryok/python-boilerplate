@@ -1,13 +1,29 @@
-FROM python:3.11-slim
+ARG DEBIAN_VERSION=bookworm
+ARG UV_VERSION=latest
+ARG VARIANT=3.13
+
+
+FROM ghcr.io/astral-sh/uv:$UV_VERSION AS uv
+
+
+FROM python:$VARIANT-slim-$DEBIAN_VERSION
 
 WORKDIR /app
 
-# uvのインストール
-RUN pip install uv
+COPY --from=uv /uv /uvx /bin/
+COPY pyproject.toml uv.lock ./
 
-COPY requirements.txt .
-# uvを使用して依存関係をインストール
-RUN uv pip install -r requirements.txt
+ENV PYTHONDONTWRITEBYTECODE=True
+ENV PYTHONUNBUFFERED=True
+ENV UV_LINK_MODE=copy
 
-# ruffのインストール
-RUN uv pip install ruff==0.9.1
+# hadolint ignore=DL3008
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    # For OpenCV etc...
+    libgl1 libglib2.0-0 \
+    # To remove the image size, it is recommended refresh the package cache as follows
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN uv sync --frozen --no-install-project
