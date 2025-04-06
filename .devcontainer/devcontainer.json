@@ -39,9 +39,17 @@
         }
       }
     },
+    "containerEnv": {
+      "DISPLAY": "dummy",
+      "PYTHONUNBUFFERED": "True",
+      "UV_LINK_MODE": "copy",
+      "UV_PROJECT_ENVIRONMENT": "/home/vscode/.venv",
+    },
     "features": {
       "ghcr.io/devcontainers/features/git:1": {},
-      "ghcr.io/devcontainers/features/github-cli:1": {}
+      "ghcr.io/devcontainers/features/github-cli:1": {},
+      "ghcr.io/dhoeric/features/hadolint:1": {}
     },
-    "postCreateCommand": "pip install uv && uv venv && . .venv/bin/activate && uv pip install -r requirements.txt"
+    "postCreateCommand": "uv sync --frozen",
+    "postStartCommand": "uv run pre-commit install",
   }
