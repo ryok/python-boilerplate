@@ -91,3 +91,13 @@ uv run python -m src.cli
 - 定型的な実装テンプレート
 
 **重要**: 新しい実装や重要な決定を行った際は、該当するファイルを更新してください。
+
+## Clineルール管理
+プロジェクト固有のルールは `.clinerules/` ディレクトリで管理されています：
+
+- `project-overview.md` - プロジェクト概要
+- `tech-stack.md` - 技術スタックとツール使用ルール
+- `development-guidelines.md` - 開発ガイドラインとコーディング規約
+- `common-commands.md` - よく使うコマンド集
+- `project-structure.md` - ディレクトリ構造と命名規則
+- `knowledge-management.md` - 知見管理システムの説明
