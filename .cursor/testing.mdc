@@ -1,0 +1,142 @@
+---
+description: テストガイドラインとベストプラクティス
+globs:
+  - "**/tests/**"
+  - "**/test_*.py"
+  - "**/*_test.py"
+alwaysApply: false
+---
+
+# テストガイドライン
+
+## テスト要件
+
+- すべての新機能にユニットテストを作成
+- tests/ディレクトリにソース構造をミラーリング
+- `uv run pytest`でテストを実行
+- 重要なロジック部分のカバレッジ90%以上を維持
+
+## テストファイル構造
+
+```
+tests/
+├── __init__.py
+├── test_cli.py          # CLIテスト
+└── core/                # コアモジュールテスト
+    ├── __init__.py
+    ├── test_config.py
+    ├── test_logger.py
+    └── test_main.py
+```
+
+## テストコマンド
+
+```bash
+# すべてのテストを実行
+uv run pytest
+
+# カバレッジ付きでテストを実行
+uv run pytest --cov=src
+
+# 特定のテストファイルを実行
+uv run pytest tests/test_specific.py
+
+# 詳細出力でテストを実行
+uv run pytest -v
+
+# 失敗したテストのみ再実行
+uv run pytest --lf
+
+# テストマーカーで実行
+uv run pytest -m "not slow"
+```
+
+## テストの書き方
+
+### 基本的なテスト構造
+```python
+import pytest
+from src.core.calculator import add, divide
+
+class TestCalculator:
+    """計算機能のテスト"""
+    
+    def test_add_positive_numbers(self):
+        """正の数の加算をテスト"""
+        assert add(2, 3) == 5
+        
+    def test_add_negative_numbers(self):
+        """負の数の加算をテスト"""
+        assert add(-1, -1) == -2
+        
+    def test_divide_by_zero(self):
+        """ゼロ除算の例外をテスト"""
+        with pytest.raises(ZeroDivisionError):
+            divide(10, 0)
+```
+
+### フィクスチャの使用
+```python
+import pytest
+from src.core.database import Database
+
+@pytest.fixture
+def db_connection():
+    """データベース接続のフィクスチャ"""
+    db = Database("test.db")
+    yield db
+    db.close()
+
+def test_database_insert(db_connection):
+    """データベースへの挿入をテスト"""
+    result = db_connection.insert("test_data")
+    assert result.success is True
+```
+
+### パラメータ化テスト
+```python
+import pytest
+
+@pytest.mark.parametrize("input,expected", [
+    (2, 4),
+    (3, 9),
+    (4, 16),
+    (-2, 4),
+])
+def test_square(input, expected):
+    """平方計算のパラメータ化テスト"""
+    assert input ** 2 == expected
+```
+
+## モックの使用
+
+```python
+from unittest.mock import Mock, patch
+from src.core.api_client import ApiClient
+
+def test_api_call_with_mock():
+    """APIコールのモックテスト"""
+    with patch('requests.get') as mock_get:
+        mock_get.return_value.json.return_value = {"status": "ok"}
+        
+        client = ApiClient()
+        result = client.get_status()
+        
+        assert result["status"] == "ok"
+        mock_get.assert_called_once()
+```
+
+## テストのベストプラクティス
+
+1. **AAA パターン**: Arrange（準備）、Act（実行）、Assert（検証）
+2. **独立性**: 各テストは他のテストに依存しない
+3. **明確な名前**: テストの目的が名前から分かる
+4. **単一の検証**: 1つのテストで1つの振る舞いを検証
+5. **エッジケース**: 境界値と異常系も必ずテスト
+
+## カバレッジ目標
+
+- 全体カバレッジ: 80%以上
+- 重要なビジネスロジック: 90%以上
+- ユーティリティ関数: 100%
+- 例外処理パス: 必須

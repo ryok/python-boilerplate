@@ -1,0 +1,147 @@
+---
+description: よく使うコマンドリファレンス
+alwaysApply: true
+---
+
+# よく使うコマンド
+
+## 依存関係管理
+
+```bash
+# すべての依存関係をインストール
+uv sync
+
+# 新しいパッケージを追加
+uv add <package-name>
+
+# 開発依存関係を追加
+uv add --dev <package-name>
+
+# 特定のバージョンを指定して追加
+uv add "package==1.2.3"
+
+# 依存関係を更新
+uv sync --upgrade
+```
+
+## コード品質チェック
+
+```bash
+# リンターを実行
+uv run ruff check .
+
+# 自動修正可能な問題を修正
+uv run ruff check . --fix
+
+# コードをフォーマット
+uv run ruff format .
+
+# 型チェックを実行
+uv run pyright
+
+# すべての品質チェックを実行
+uv run ruff check . && uv run ruff format . && uv run pyright
+```
+
+## テスト実行
+
+```bash
+# すべてのテストを実行
+uv run pytest
+
+# カバレッジレポート付きでテスト
+uv run pytest --cov=src --cov-report=html
+
+# 特定のテストファイルを実行
+uv run pytest tests/test_specific.py
+
+# 特定のテスト関数を実行
+uv run pytest tests/test_module.py::test_function
+
+# 詳細出力でテスト
+uv run pytest -v
+
+# 最初の失敗で停止
+uv run pytest -x
+
+# 前回失敗したテストのみ実行
+uv run pytest --lf
+```
+
+## アプリケーション実行
+
+```bash
+# CLIアプリケーションを実行
+uv run python -m src.cli
+
+# 環境変数を設定して実行
+ENV_VAR=value uv run python -m src.cli
+
+# デバッグモードで実行
+uv run python -m src.cli --debug
+
+# ヘルプを表示
+uv run python -m src.cli --help
+```
+
+## Docker操作
+
+```bash
+# コンテナをビルド
+docker-compose build
+
+# サービスを起動
+docker-compose up
+
+# バックグラウンドで起動
+docker-compose up -d
+
+# ログを表示
+docker-compose logs -f
+
+# 特定のサービスのログ
+docker-compose logs -f app
+
+# コンテナを停止
+docker-compose down
+
+# ボリュームも含めて削除
+docker-compose down -v
+
+# コンテナ内でコマンド実行
+docker-compose exec app bash
+```
+
+## プロジェクト構造確認
+
+```bash
+# プロジェクト構造を表示
+tree -I 'myenv|__pycache__|*.pyc|.git'
+
+# Pythonファイルのみ表示
+find . -name "*.py" -type f | grep -v myenv | sort
+
+# 大きなファイルを検索
+find . -type f -size +1M | grep -v myenv
+```
+
+## 開発ワークフロー
+
+```bash
+# 1. 依存関係をインストール
+uv sync
+
+# 2. コードを編集
+
+# 3. フォーマットとリント
+uv run ruff format . && uv run ruff check . --fix
+
+# 4. 型チェック
+uv run pyright
+
+# 5. テストを実行
+uv run pytest
+
+# 6. カバレッジを確認
+uv run pytest --cov=src --cov-report=term-missing
+```

@@ -1,0 +1,98 @@
+---
+description: コーディング規約とベストプラクティス
+globs:
+  - "**/*.py"
+  - "**/src/**"
+alwaysApply: false
+---
+
+# コーディング規約
+
+## コードスタイル
+
+- PEP 8標準に従う（Ruffで自動チェック）
+- 意味のある変数名と関数名を使用
+- 関数は小さく、単一の目的に焦点を当てる
+- 深いネストを避ける
+- 適切な空白行で論理的なブロックを分離
+
+## 型ヒント
+
+- **すべての関数に型ヒントを必須とする**
+- パラメータと戻り値に適切な型アノテーションを使用
+- 必要に応じてtypingモジュールから型をインポート
+- Pyrightはstrictモードで実行 - すべての型エラーを修正
+
+### 型ヒントの例
+```python
+from typing import List, Dict, Optional, Union
+
+def process_data(items: List[str], config: Dict[str, Any]) -> Optional[str]:
+    """データを処理して結果を返す"""
+    pass
+
+def calculate_score(value: Union[int, float]) -> float:
+    """スコアを計算する"""
+    return float(value) * 1.5
+```
+
+## ドキュメント
+
+- すべての関数とクラスにdocstringを使用
+- GoogleまたはNumPyのdocstringスタイルに従う
+- docstringは簡潔だが情報豊富に
+- 機能変更時はドキュメントを更新
+
+### Docstringの例
+```python
+def calculate_total(items: List[float], tax_rate: float) -> float:
+    """アイテムの合計金額を計算する。
+    
+    Args:
+        items: 価格のリスト
+        tax_rate: 税率（0.0-1.0）
+        
+    Returns:
+        税込みの合計金額
+        
+    Raises:
+        ValueError: 税率が無効な場合
+    """
+    if not 0 <= tax_rate <= 1:
+        raise ValueError("税率は0.0から1.0の間である必要があります")
+    
+    subtotal = sum(items)
+    return subtotal * (1 + tax_rate)
+```
+
+## コード品質
+
+- コメントアウトされたコードをコミットに含めない
+- デバッグ用のprint文を削除
+- 例外を適切に処理
+- print文の代わりにloggingを使用
+- 適切なエラーメッセージを提供
+
+## ログ記録
+
+```python
+import logging
+
+logger = logging.getLogger(__name__)
+
+def process_item(item_id: str) -> None:
+    logger.info(f"処理開始: {item_id}")
+    try:
+        # 処理ロジック
+        logger.debug(f"アイテム {item_id} の詳細処理")
+    except Exception as e:
+        logger.error(f"アイテム {item_id} の処理中にエラー: {e}")
+        raise
+```
+
+## セキュリティ考慮事項
+
+- 入力値の検証を必ず実施
+- SQLインジェクション対策
+- 機密情報をログに出力しない
+- 環境変数で機密設定を管理
