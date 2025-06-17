@@ -1,140 +1,193 @@
 # Python ボイラープレート
 
-再利用可能なPythonプロジェクトの基本構造を提供するボイラープレートです。
+モダンなPython開発環境のベストプラクティスに従った、再利用可能なプロジェクトテンプレートです。
 
-## 機能
+## 特徴
 
-- 基本的なパッケージ構造
-- ロギング機能
-- コマンドライン引数の処理
-- 設定ファイル読み込み（YAML/JSON）
-- 単体テスト環境
+- **モダンなツールチェーン**: uv（高速パッケージマネージャー）、Ruff（リンター/フォーマッター）、Pyright（型チェッカー）
+- **包括的なプロジェクト構造**: ソースコード、テスト、ドキュメントの明確な分離
+- **知見管理システム**: Claude AIとCursor IDE向けの構造化されたナレッジベース
+- **Docker対応**: 開発と本番環境のためのコンテナ化サポート
+- **厳格な品質管理**: 自動フォーマット、リンティング、型チェック
+- **テスト駆動開発**: pytestによる包括的なテスト環境
 
-## 要件
+## 技術スタック
 
-- Python 3.8以上
-- PyYAML 6.0以上
+- **Python**: 3.11以上
+- **パッケージマネージャー**: [uv](https://github.com/astral-sh/uv)
+- **リンター/フォーマッター**: [Ruff](https://github.com/charliermarsh/ruff)
+- **型チェッカー**: [Pyright](https://github.com/microsoft/pyright) (strictモード)
+- **テストフレームワーク**: [pytest](https://pytest.org)
+- **コンテナ**: Docker / Docker Compose
 
-## インストール
+## クイックスタート
 
-### 開発環境のセットアップ（uvを使用）
+### 前提条件
 
 ```bash
-# リポジトリのクローン
-git clone https://github.com/yourusername/python-boilerplate.git
-cd python-boilerplate
-
 # uvのインストール（まだインストールしていない場合）
-pip install uv
-
-# uvを使用して仮想環境の作成と依存パッケージのインストール
-uv venv
-source .venv/bin/activate  # Linuxの場合
-# または
-.venv\Scripts\activate  # Windowsの場合
-
-# 開発用依存パッケージのインストール
-uv pip install -e ".[dev]"
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-### 従来の方法（pipを使用）
+### セットアップ
 
 ```bash
 # リポジトリのクローン
-git clone https://github.com/yourusername/python-boilerplate.git
+git clone https://github.com/ryok/python-boilerplate.git
 cd python-boilerplate
 
-# 仮想環境の作成と有効化
-python -m venv venv
-source venv/bin/activate  # Linuxの場合
-# または
-venv\Scripts\activate  # Windowsの場合
+# 依存関係のインストール（uvが自動的に仮想環境を作成）
+uv sync
 
-# 開発用依存パッケージのインストール
-pip install -e ".[dev]"
+# 開発環境の確認
+uv run python -m src.cli --version
 ```
 
-## 使い方
+## 開発ワークフロー
 
-### コマンドラインからの実行
+### よく使うコマンド
 
 ```bash
-# ヘルプの表示
-python-boilerplate --help
+# コード品質チェック
+uv run ruff check .              # リンティング
+uv run ruff format .             # コードフォーマット
+uv run pyright                   # 型チェック
 
-# バージョン情報の表示
-python-boilerplate --version
+# テスト実行
+uv run pytest                    # 全テスト実行
+uv run pytest --cov=src          # カバレッジ付きテスト
 
-# アプリケーションの実行
-python-boilerplate run
+# アプリケーション実行
+uv run python -m src.cli         # CLIアプリケーション起動
+uv run python -m src.cli --help  # ヘルプ表示
 
-# 設定ファイルを指定して実行
-python-boilerplate -c config.yaml run
-
-# ログレベルを指定して実行
-python-boilerplate -l DEBUG run
-
-# アプリケーションの初期化
-python-boilerplate init
+# Docker環境
+docker-compose up -d             # コンテナ起動
+docker-compose logs -f           # ログ確認
+docker-compose down              # コンテナ停止
 ```
 
-### ライブラリとしての使用
+### 新機能の追加手順
 
-```python
-from src.core.config import ConfigManager
-from src.core.logger import Logger
-from src.core.main import Application
-
-# 設定の読み込み
-config = ConfigManager("config.yaml")
-
-# ロガーの初期化
-logger = Logger("my-app", level="INFO", log_file="app.log")
-
-# アプリケーションの実行
-app = Application(config_path="config.yaml")
-app.run()
-```
+1. **ブランチ作成**: `git checkout -b feature/new-feature`
+2. **実装**: srcディレクトリに機能を追加
+3. **テスト作成**: testsディレクトリに対応するテストを追加
+4. **品質チェック**: 
+   ```bash
+   uv run ruff format . && uv run ruff check . --fix
+   uv run pyright
+   uv run pytest
+   ```
+5. **コミット**: 適切なプレフィックスを使用（例: `[feat] 新機能を追加`）
+6. **プルリクエスト**: GitHubでPRを作成
 
 ## プロジェクト構造
 
 ```
 python-boilerplate/
-├── docs/               # ドキュメント
-│   └── design.md       # 設計書
-├── src/                # ソースコード
-│   ├── __init__.py     # パッケージ定義
-│   ├── core/           # コア機能
-│   │   ├── __init__.py # パッケージ定義
-│   │   ├── config.py   # 設定管理
-│   │   ├── logger.py   # ロギング
-│   │   └── main.py     # メイン機能
-│   └── cli.py          # コマンドラインインターフェース
-├── tests/              # テストコード
-│   ├── __init__.py     # パッケージ定義
-│   ├── core/           # コア機能のテスト
-│   │   ├── __init__.py # パッケージ定義
-│   │   ├── test_config.py  # 設定管理のテスト
-│   │   ├── test_logger.py  # ロギングのテスト
-│   │   └── test_main.py    # メイン機能のテスト
-│   └── test_cli.py     # CLIのテスト
-├── .gitignore          # Git除外設定
-├── pyproject.toml      # プロジェクト設定
-└── README.md           # プロジェクト説明
+├── .claude/                 # Claude AI知見管理
+│   ├── context.md          # プロジェクト背景
+│   ├── project-knowledge.md # 実装パターン
+│   ├── project-improvements.md # 改善記録
+│   └── common-patterns.md  # コマンドパターン
+├── .clinerules/            # Cline AI ルール管理
+│   ├── project-overview.md # プロジェクト概要
+│   ├── tech-stack.md       # 技術スタック
+│   └── ...                 # その他のルール
+├── .cursor/                # Cursor IDE設定
+│   ├── coding-standards.mdc # コーディング規約
+│   ├── commands.mdc        # コマンドリファレンス
+│   └── ...                 # その他の設定
+├── src/                    # ソースコード
+│   ├── __init__.py
+│   ├── cli.py             # CLIインターフェース
+│   └── core/              # コアモジュール
+│       ├── __init__.py
+│       ├── config.py      # 設定管理
+│       ├── logger.py      # ロギング設定
+│       └── main.py        # メインエントリーポイント
+├── tests/                 # テストコード
+│   ├── __init__.py
+│   ├── test_cli.py
+│   └── core/
+│       ├── __init__.py
+│       ├── test_config.py
+│       ├── test_logger.py
+│       └── test_main.py
+├── Dockerfile             # Dockerコンテナ定義
+├── docker-compose.yml     # Docker Compose設定
+├── pyproject.toml         # プロジェクト設定
+├── ruff.toml             # Ruffリンター設定
+├── pyrightconfig.json     # Pyright型チェック設定
+├── uv.lock               # 依存関係ロックファイル
+├── CLAUDE.md             # Claude AI用プロジェクト説明
+└── README.md             # このファイル
 ```
 
-## テスト
+## 知見管理システム
+
+このプロジェクトは、AI開発支援ツール向けの構造化された知見管理システムを採用しています。
+
+### Claude AI (.claude/)
+プロジェクトの深い理解とコンテキスト共有のための知見管理：
+- `context.md` - プロジェクトの背景と制約
+- `project-knowledge.md` - 実装パターンと設計決定
+- `project-improvements.md` - 改善履歴と学んだ教訓
+- `common-patterns.md` - 再利用可能なコードパターン
+
+### Cline AI (.clinerules/)
+プロジェクト固有のルールとガイドライン：
+- `project-overview.md` - プロジェクト概要
+- `tech-stack.md` - 技術スタック詳細
+- `development-guidelines.md` - 開発ガイドライン
+- その他のドメイン固有ルール
+
+### Cursor IDE (.cursor/)
+IDE固有の設定とナレッジベース（.mdcフォーマット）：
+- `coding-standards.mdc` - コーディング規約
+- `commands.mdc` - よく使うコマンド集
+- `git-workflow.mdc` - Gitワークフロー
+- その他のIDE設定
+
+詳細は[CLAUDE.md](CLAUDE.md)を参照してください。
+
+## コーディング規約
+
+- **PEP 8準拠**: Ruffによる自動チェック
+- **型ヒント必須**: すべての関数に型アノテーション
+- **Docstring**: GoogleまたはNumPyスタイル
+- **テスト**: 新機能には必ずユニットテスト
+- **コミットメッセージ**: プレフィックス規約を使用
+  - `[feat]` - 新機能
+  - `[fix]` - バグ修正
+  - `[refactor]` - リファクタリング
+  - `[test]` - テスト追加/修正
+  - `[docs]` - ドキュメント更新
+  - `[chore]` - 環境設定変更
+
+## Docker環境
 
 ```bash
-# すべてのテストを実行
-pytest
+# 開発環境の起動
+docker-compose up -d
 
-# カバレッジレポートを生成
-pytest --cov=src
+# コンテナ内でコマンド実行
+docker-compose exec app uv run pytest
 
-# 特定のテストを実行
-pytest tests/core/test_config.py
+# ログの確認
+docker-compose logs -f app
+
+# 環境のクリーンアップ
+docker-compose down -v
 ```
+
+## 貢献方法
+
+1. このリポジトリをフォーク
+2. 機能ブランチを作成 (`git checkout -b feature/amazing-feature`)
+3. 変更をコミット (`git commit -m '[feat] Add amazing feature'`)
+4. ブランチにプッシュ (`git push origin feature/amazing-feature`)
+5. プルリクエストを作成
 
 ## ライセンス
 
