@@ -1,0 +1,159 @@
+---
+description: Git操作とワークフローガイドライン
+globs:
+  - "**/.git/**"
+  - "**/.github/**"
+alwaysApply: false
+---
+
+# Git ワークフロー
+
+## コミットメッセージ規約
+
+以下のプレフィックスを使用してコミットの種類を明確にする：
+
+- `[feat]` - 新機能追加
+- `[fix]` - バグ修正
+- `[refactor]` - コードリファクタリング
+- `[test]` - テスト追加/修正
+- `[docs]` - ドキュメント修正
+- `[chore]` - 環境設定変更やCI/CD設定変更
+- `[style]` - コードスタイルの変更（動作に影響しない）
+- `[perf]` - パフォーマンス改善
+
+### コミットメッセージの例
+```bash
+git commit -m "[feat] ユーザー認証機能を追加"
+git commit -m "[fix] ログイン時のセッション管理バグを修正"
+git commit -m "[test] ユーザー認証のユニットテストを追加"
+```
+
+## 基本的なGit操作
+
+```bash
+# ステータス確認（必須）
+git status
+
+# 変更内容の確認
+git diff
+git diff --staged
+
+# ファイルの追加
+git add <file>
+git add .
+
+# コミット
+git commit -m "[type] メッセージ"
+
+# 履歴確認
+git log --oneline -10
+git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
+```
+
+## ブランチ管理
+
+```bash
+# ブランチ一覧
+git branch -a
+
+# 新しいブランチを作成して切り替え
+git checkout -b feature/new-feature
+
+# ブランチの切り替え
+git checkout main
+
+# ブランチの削除
+git branch -d feature/completed-feature
+
+# リモートブランチの追跡
+git checkout -b feature/new-feature origin/feature/new-feature
+```
+
+## Pull Request 作成
+
+```bash
+# 1. 変更をコミット
+git add .
+git commit -m "[feat] 新機能を実装"
+
+# 2. リモートにプッシュ
+git push -u origin feature/new-feature
+
+# 3. PR作成
+gh pr create --title "[feat] 新機能の実装" --body "
+## 概要
+新機能を実装しました。
+
+## 変更内容
+- 機能Aを追加
+- 機能Bを改善
+
+## テスト
+- ユニットテストを追加
+- 手動テストで動作確認済み
+"
+
+# 4. PRのステータス確認
+gh pr status
+gh pr view <PR番号>
+```
+
+## コードレビュー
+
+```bash
+# PRの差分を確認
+gh pr diff <PR番号>
+
+# ファイルごとにコメント
+gh api repos/{owner}/{repo}/pulls/<PR番号>/comments \
+  -F body="レビューコメント" \
+  -F commit_id="$(gh pr view <PR番号> --json headRefOid --jq .headRefOid)" \
+  -F path="対象ファイルのパス" \
+  -F position=<行番号>
+
+# PRをマージ
+gh pr merge <PR番号> --squash
+```
+
+## リベースとコンフリクト解決
+
+```bash
+# mainブランチの最新を取得
+git fetch origin main
+
+# リベース
+git rebase origin/main
+
+# コンフリクトが発生した場合
+# 1. コンフリクトを解決
+# 2. ファイルを追加
+git add <resolved-file>
+# 3. リベースを続行
+git rebase --continue
+
+# リベースを中止
+git rebase --abort
+```
+
+## 便利なGitエイリアス
+
+```bash
+# ~/.gitconfigに追加
+[alias]
+    st = status
+    co = checkout
+    br = branch
+    cm = commit
+    lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
+    unstage = reset HEAD --
+    last = log -1 HEAD
+```
+
+## 重要な注意事項
+
+1. **必ず`git status`で確認**してからコミット
+2. ファイルの移動・削除は`git mv`や`git rm`を使用
+3. 大きな変更は小さなコミットに分割
+4. 機密情報をコミットしない
+5. `.gitignore`を適切に設定
+6. force pushは避ける（特にmainブランチ）

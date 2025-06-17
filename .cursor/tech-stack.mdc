@@ -1,0 +1,51 @@
+---
+description: 技術スタックとツール使用ルール
+globs:
+  - "**/*.py"
+  - "**/pyproject.toml"
+  - "**/requirements*.txt"
+  - "**/Dockerfile"
+  - "**/docker-compose.yml"
+alwaysApply: false
+---
+
+# 技術スタック
+
+## コア技術
+
+- **Python**: バージョン3.11以上を使用
+- **パッケージマネージャー**: 常に`uv`を使用（pipは使用禁止）
+- **リンター/フォーマッター**: Ruffを使用
+- **型チェッカー**: Pyright（strictモード）
+- **テストフレームワーク**: pytest
+- **コンテナ化**: DockerとDocker Compose
+
+## ツール使用ルール
+
+### 依存関係管理
+- pipを直接使用しない、常にuvコマンドを使用
+- `uv sync`で依存関係をインストール
+- `uv add`で新しいパッケージを追加
+- `uv add --dev`で開発依存関係を追加
+
+### コード品質
+- `uv run pyright`で型チェックを実行
+- `uv run ruff format .`でコードをフォーマット
+- `uv run ruff check .`でコード品質をチェック
+- `uv run ruff check . --fix`で自動修正
+
+### 仮想環境
+- 仮想環境は`myenv/`ディレクトリに配置
+- 仮想環境をgitにコミットしない
+
+## 設定ファイル
+
+- `pyproject.toml`: プロジェクト設定とメタデータ
+- `ruff.toml`: Ruffリンター/フォーマッター設定
+- `pyrightconfig.json`: Pyright型チェッカー設定（strictモード）
+- `uv.lock`: 依存関係のロックファイル
+
+## Docker環境
+- 本番環境と同じコンテナイメージを使用
+- docker-compose.ymlで開発環境を定義
+- マルチステージビルドで最適化
